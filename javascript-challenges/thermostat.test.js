@@ -1,0 +1,140 @@
+const Thermostat = require('./thermostat')
+
+describe('thermostat', () => {
+
+it('instatiates the new thermostat with initial temperature at 20 and power saving on', () => {
+    let newThermostat = new Thermostat()
+    expect(newThermostat.temperature).toBe(20)
+    expect(newThermostat.powerSavingMode).toBe(true)
+})
+
+it('instatiates the new thermostat and reads back the initial temperature with getTemperature', () => {
+    let newThermostat = new Thermostat()
+    expect(newThermostat.getTemperature()).toBe(20)
+})
+
+it('tests the ability to set power saving mode by switching it off', () => {
+    let newThermostat = new Thermostat()
+    newThermostat.setPowerSavingMode(false)
+    expect(newThermostat.powerSavingMode).toBe(false)
+})
+
+it('increases the temperature once', () => {
+    let newThermostat = new Thermostat()
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(21)
+})
+
+it('increases the temperature once and decreases it twice', () => {
+    let newThermostat = new Thermostat()
+    newThermostat.tempUp()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    expect(newThermostat.temperature).toBe(19)
+})
+
+it('decreases the temperature to the minumum to throw an error message', () => {
+    const logSpy = jest.spyOn(global.console, 'log')
+    let newThermostat = new Thermostat()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    expect(logSpy).toHaveBeenCalledWith('Cannot lower temperature below 10 degrees')
+})
+
+it('increases the temperature by three degrees and then resets to 20', () => {
+    let newThermostat = new Thermostat()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(23)
+    newThermostat.reset()
+    expect(newThermostat.temperature).toBe(20)
+})
+
+it('tests the upper temperature limit with power saving mode on', () => {
+    const logSpy = jest.spyOn(global.console, 'log')
+    let newThermostat = new Thermostat()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(25)
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(25)
+    expect(logSpy).toHaveBeenCalledWith('Maximum temperature reached at 25')
+})
+
+it('tests the upper temperature limit with power saving mode off', () => {
+    const logSpy = jest.spyOn(global.console, 'log')
+    let newThermostat = new Thermostat()
+    newThermostat.setPowerSavingMode(false)
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(32)
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(32)
+    expect(logSpy).toHaveBeenCalledWith('Maximum temperature reached at 32')
+})
+
+it('queries energy use at 18 degrees', () => {
+    const logSpy = jest.spyOn(global.console, 'log')
+    let newThermostat = new Thermostat()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    newThermostat.tempDown()
+    expect(newThermostat.temperature).toBe(17)
+    newThermostat.queryEnergyUsage()
+    expect(logSpy).toHaveBeenCalledWith('Low energy use')
+})
+
+it('queries energy use at 23 degrees', () => {
+    const logSpy = jest.spyOn(global.console, 'log')
+    let newThermostat = new Thermostat()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(23)
+    newThermostat.queryEnergyUsage()
+    expect(logSpy).toHaveBeenCalledWith('Medium energy use')
+})
+
+it('queries energy use at 30 degrees', () => {
+    const logSpy = jest.spyOn(global.console, 'log')
+    let newThermostat = new Thermostat()
+    newThermostat.setPowerSavingMode(false)
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    newThermostat.tempUp()
+    expect(newThermostat.temperature).toBe(30)
+    newThermostat.queryEnergyUsage()
+    expect(logSpy).toHaveBeenCalledWith('High energy use')
+})
+
+})
